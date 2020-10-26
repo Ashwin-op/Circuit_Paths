@@ -2,10 +2,12 @@
 
 Finding all possible paths between input and output in a given Combinational Circuit.
 
+
 ## Requirements
 
-- [Networkx]() for graph algorithms
-- [Matplotlib]() for plotting
+- [Networkx](https://networkx.org/) for graph algorithms
+- [Matplotlib](https://matplotlib.org/) for plotting
+
 
 ## Usage
 
@@ -14,6 +16,7 @@ pip3 install -r requirements.txt
 
 python3 main.py
 ```
+
 
 ## Information
 
@@ -31,6 +34,10 @@ Output: All paths from input to output of the circuit described by the Verilog f
 
 ## Sample Output Graphs
 
+### C17 ISCAS85 
+
 ![C17](./images/c17.png)
+
+### Full Adder
 
 ![Full Adder](./images/fa.png)
