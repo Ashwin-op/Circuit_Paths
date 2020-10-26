@@ -4,7 +4,8 @@ Finding all possible paths between input and output in a given Combinational Cir
 
 ## Requirements
 
-- [ttable](https://tt.brianwel.ch/en/latest/)
+- [Networkx]() for graph algorithms
+- [Matplotlib]() for plotting
 
 ## Usage
 
@@ -16,10 +17,20 @@ python3 main.py
 
 ## Information
 
-Available operators: `and`, `iff`, `impl`, `nand`, `nor`, `not`, `nxor`, `or`, `xnor`, `xor`
+Input: Verilog file with Gate Level Modelling
 
-Example Input: `A and B or not C xor D`
+Output: All paths from input to output of the circuit described by the Verilog file
+
+(Optional: Graph of the circuit can also be exported)
+
 
 ## Sample Output
 
 ![Output](./images/Output.png)
+
+
+## Sample Output Graphs
+
+![C17](./images/c17.png)
+
+![Full Adder](./images/fa.png)

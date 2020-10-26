@@ -9,7 +9,7 @@ def printInfo():
     Prints general information about working of this script
     :return: None
     """
-    print('\t\t\tCombinational Circuit Paths')
+    print('\t' * 6 + 'Combinational Circuit Paths')
 
     print('-' * 75)
 
@@ -17,7 +17,7 @@ def printInfo():
     print('Output: All paths from input to output of the circuit described by the Verilog file')
     print('(Optional: Graph of the circuit can also be exported)')
 
-    print('-' * 75, end='\n')
+    print('-' * 75, end='\n\n')
 
 
 def parse(filename):
@@ -93,7 +93,7 @@ def printPaths(graph, data):
     print('Input: ', end='')
     print(*data['input'], sep=', ')
     print('Output: ', end='')
-    print(*data['output'], sep=', ', end='\n')
+    print(*data['output'], sep=', ', end='\n\n')
 
     # Printing the paths in the graphical version of the circuit
     print('All paths from input to output')
@@ -117,8 +117,8 @@ if __name__ == '__main__':
         printPaths(G, data)
 
         # Draw Graph
-        # plt.subplots(tight_layout=False)
-        # nx.draw(G, with_labels=True)
-        # plt.savefig(f'{str(filename).split(".")[0]}.png')
+        plt.subplots(tight_layout=False)
+        nx.draw(G, with_labels=True)
+        plt.savefig(f'{str(filename).split(".")[0]}.png')
 
         print('-' * 75, end='\n\n')
