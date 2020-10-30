@@ -20,6 +20,25 @@ def printInfo():
     print('-' * 75, end='\n\n')
 
 
+def parse_line(data, line, keyword):
+    """
+    Parse the given line to extract required the information
+    :param data: A dictionary to store the parsed information
+    :param line: The line to parse
+    :param keyword: The type of keyword
+    :return: None
+    """
+    if '[' in line:
+        pos = re.search(r'\[(.*)\]', line).group(1).split(':')
+        pos = sorted([int(i.strip()) for i in pos])
+        for i in range(pos[0], pos[1]):
+            for j in re.search(r'\](.*);', line).group(1).split(','):
+                data[keyword].append(j.strip() + f'[{i}]')
+    else:
+        for i in re.search(rf'{keyword}(.*);', line).group(1).split(','):
+            data[keyword].append(i.strip())
+
+
 def parse(filename):
     """
     Parses the Verilog file with the given name to extract details about the Combinational circuit
@@ -50,30 +69,16 @@ def parse(filename):
 
     try:
         for line in content[1:-1]:
-            # Get input terminals
-            if 'input' in line[:6]:
-                for i in re.search(r't.*;', line).group()[1:-1].strip().split(','):
-                    data['input'].append(i.strip())
-
-            # Get output terminals
-            if 'output' in line[:7]:
-                for i in re.search(r't.*;', line).group()[4:-1].strip().split(','):
-                    data['output'].append(i.strip())
-
-            # Get intermediate wires
-            if 'wire' in line[:5]:
-                for i in re.search(r'e.*;', line).group()[1:-1].strip().split(','):
-                    data['wire'].append(i.strip())
-
-            # Get intermediate reg
-            if 'reg' in line[:4]:
-                for i in re.search(r'g.*;', line).group()[1:-1].strip().split(','):
-                    data['reg'].append(i.strip())
+            # Get module parameters
+            keywords = ['input', 'output', 'wire', 'reg']
+            for key in keywords:
+                if key in line[:len(key) + 1]:
+                    parse_line(data, line, key)
 
             # Get connections
             if any(x in line[:5] for x in ['nand', 'nor', 'not', 'xor', 'and', 'or', 'xnor']):
-                gate = re.search(r' .*\(', line).group()[:-1].strip().split()[0]
-                inputs = [s.strip() for s in re.search(r'\(.*\)', line).group()[1:-1].split(',')]
+                gate = re.search(r' (.*)\(', line).group(1).strip()
+                inputs = [s.strip() for s in re.search(r'\((.*)\)', line).group(1).split(',')]
                 for i in inputs[1:]:
                     data['connections'].append((i, gate))
                 data['connections'].append((gate, inputs[0]))
@@ -98,7 +103,9 @@ def printPaths(graph, data):
     print('Input: ', end='')
     print(*data['input'], sep=', ')
     print('Output: ', end='')
-    print(*data['output'], sep=', ', end='\n\n')
+    print(*data['output'], sep=', ')
+    print('Wire: ', end='')
+    print(*data['wire'], sep=', ', end='\n\n')
 
     # Printing the paths in the graphical version of the circuit
     print('All paths from input to output')
@@ -119,8 +126,7 @@ if __name__ == '__main__':
         G.add_edges_from(data['connections'])
 
         # Printing all the paths from input to output
-        # printPaths(G, data)
-        print(data)
+        printPaths(G, data)
 
         # Draw Graph
         # plt.subplots(tight_layout=False)
