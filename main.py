@@ -36,45 +36,50 @@ def parse(filename):
         'module_name': '',
         'input': [],
         'output': [],
-        'wires': [],
+        'wire': [],
         'reg': [],
         'connections': []
     }
 
     # Get module name
-    for line in content:
-        if 'module' in line[:7]:
-            data['module_name'] = re.search(r'e.*\(', line).group()[1:-1].strip()
-            break
+    if 'module' in content[0][:7]:
+        data['module_name'] = re.search(r'e.*\(', content[0]).group()[1:-1].strip()
+    else:
+        print("Module name not present!")
+        exit(0)
 
-    for line in content:
-        # Get input terminals
-        if 'input' in line[:6]:
-            for i in re.search(r't.*;', line).group()[1:-1].strip().split(','):
-                data['input'].append(i.strip())
+    try:
+        for line in content[1:-1]:
+            # Get input terminals
+            if 'input' in line[:6]:
+                for i in re.search(r't.*;', line).group()[1:-1].strip().split(','):
+                    data['input'].append(i.strip())
 
-        # Get output terminals
-        if 'output' in line[:7]:
-            for i in re.search(r't.*;', line).group()[4:-1].strip().split(','):
-                data['output'].append(i.strip())
+            # Get output terminals
+            if 'output' in line[:7]:
+                for i in re.search(r't.*;', line).group()[4:-1].strip().split(','):
+                    data['output'].append(i.strip())
 
-        # Get intermediate wires
-        if 'wire' in line[:5]:
-            for i in re.search(r'e.*;', line).group()[1:-1].strip().split(','):
-                data['wires'].append(i.strip())
+            # Get intermediate wires
+            if 'wire' in line[:5]:
+                for i in re.search(r'e.*;', line).group()[1:-1].strip().split(','):
+                    data['wire'].append(i.strip())
 
-        # Get intermediate reg
-        if 'reg' in line[:4]:
-            for i in re.search(r'g.*;', line).group()[1:-1].strip().split(','):
-                data['wires'].append(i.strip())
+            # Get intermediate reg
+            if 'reg' in line[:4]:
+                for i in re.search(r'g.*;', line).group()[1:-1].strip().split(','):
+                    data['reg'].append(i.strip())
 
-        # Get connections
-        if any(x in line[:5] for x in ['nand', 'nor', 'not', 'xor', 'and', 'or']):
-            output = re.search(r' .*\(', line).group()[:-1].strip().split()[0]
-            inputs = [s.strip() for s in re.search(r'\(.*\)', line).group()[1:-1].split(',')]
-            data['connections'].append((inputs[1], output))
-            data['connections'].append((inputs[2], output))
-            data['connections'].append((output, inputs[0]))
+            # Get connections
+            if any(x in line[:5] for x in ['nand', 'nor', 'not', 'xor', 'and', 'or', 'xnor']):
+                gate = re.search(r' .*\(', line).group()[:-1].strip().split()[0]
+                inputs = [s.strip() for s in re.search(r'\(.*\)', line).group()[1:-1].split(',')]
+                for i in inputs[1:]:
+                    data['connections'].append((i, gate))
+                data['connections'].append((gate, inputs[0]))
+    except:
+        print("Not supported!")
+        exit(0)
 
     return data
 
@@ -114,11 +119,12 @@ if __name__ == '__main__':
         G.add_edges_from(data['connections'])
 
         # Printing all the paths from input to output
-        printPaths(G, data)
+        # printPaths(G, data)
+        print(data)
 
         # Draw Graph
-        plt.subplots(tight_layout=False)
-        nx.draw(G, with_labels=True)
-        plt.savefig(f'{str(filename).split(".")[0]}.png')
+        # plt.subplots(tight_layout=False)
+        # nx.draw(G, with_labels=True)
+        # plt.savefig(f'{str(filename).split(".")[0]}.png')
 
         print('-' * 75, end='\n\n')
